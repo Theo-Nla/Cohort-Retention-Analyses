@@ -1,0 +1,159 @@
+SELECT [InvoiceNo]
+      ,[StockCode]
+      ,[Description]
+      ,[Quantity]
+      ,[InvoiceDate]
+      ,[UnitPrice]
+      ,[CustomerID]
+      ,[Country]
+   FROM [Project_1].[dbo].[Online_Retails]
+
+  --CLEANING DATA
+  --total records = 541909
+  SELECT [InvoiceNo]
+      ,[StockCode]
+      ,[Description]
+      ,[Quantity]
+      ,[InvoiceDate]
+      ,[UnitPrice]
+      ,[CustomerID]
+      ,[Country]
+   FROM [Project_1].[dbo].[Online_Retails]
+
+  --no customer id =135080
+  SELECT *
+	  FROM [Project_1].[dbo].[Online_Retails]
+	  WHERE CUSTOMERID IS NULL
+  
+  --customers with  id= 406829
+ 
+with OnlineRetail_Info as
+ ( 
+  SELECT *
+	  FROM [Project_1].[dbo].[Online_Retails]
+	  WHERE CUSTOMERID != 0
+  )
+, quantityunit_price as 
+(
+  ---397884 record with quantity and unit price
+ select *
+	 from OnlineRetail_Info
+	 where Quantity > 0 and UnitPrice > 0
+ )
+
+--select* from quantityunit_price
+, Duplicate_Check as
+(
+--Duplicate Check
+	 select*, ROW_NUMBER() 
+	 over (partition by invoiceno, stockcode,quantity 
+	 order by invoicedate)duplicate_flag 
+	 from quantityunit_price 
+ )
+  
+-- 392669 Clean Data
+-- 5215 Dplicate Records
+ select *
+	 into #Clean_Online_Retail
+	 from Duplicate_Check
+	 where duplicate_flag = 1
+
+
+ ----------------- USING CLEANED DATA -----------------------------------
+ select * from #Clean_Online_Retail
+
+ --Unique Identifier (CustomerID)
+ --Initial Start Date (First Invoice Date)
+ --Revenue Date
+
+ Select
+ Customerid,
+ min(InvoiceDate) first_purchase_date,
+ DATEFROMPARTS(year(min(InvoiceDate)), month(min(InvoiceDate)),1) Cohort_Date
+ into #cohort
+ from #Clean_Online_Retail
+ group by CustomerID
+
+ select *
+ from #cohort
+
+ -- Create Cohort Index
+select
+	mmm.*,
+	cohort_index = year_diff * 12 + month_diff + 1
+into #Cohort_Retention
+from
+	(
+		 SELECT
+			 mm.*, 
+			 year_diff = invoice_year - cohort_year,
+			 month_diff = invoice_month - cohort_month
+		 from
+			 (
+				 select
+					 m.*,
+					 c.Cohort_Date,
+					 year(m.InvoiceDate) invoice_year,
+					 month(m.InvoiceDate) invoice_month,
+					 year(c.cohort_date) Cohort_year,
+					 month(c.Cohort_Date) Cohort_month 
+					 from #Clean_Online_Retail m
+					 left join #cohort c
+					 on m.CustomerID = c. CustomerID
+			 )mm
+	)mmm
+
+	select * from #cohort_retention
+
+	----Pivot data to see the cohort table
+select *
+	 into #cohort_pivot
+	from(
+ 
+		Select distinct
+			CustomerID,
+			Cohort_date,
+			Cohort_index
+		 from #Cohort_Retention
+ )tbl
+ pivot
+ (
+	 count(customerid)
+	 for cohort_index in
+ (
+[1],
+[2],
+[3],
+[4],
+[5],
+[6],
+[7],
+[8],
+[9],
+[10],
+[11],
+[12],
+[13])
+
+) as pivot_table
+
+select *
+	from #cohort_pivot
+	order by Cohort_Date
+
+select Cohort_Date , 
+1.0 *[1]/[1] * 100 as [1],
+1.0 *[2]/[1] * 100 as [2],
+1.0 *[3]/[1] * 100 as [3],
+1.0 *[4]/[1] * 100 as [4],
+1.0 *[5]/[1] * 100 as [5],
+1.0 *[6]/[1] * 100 as [6],
+1.0 *[7]/[1] * 100 as [7],
+1.0 *[8]/[1] * 100 as [8],
+1.0 *[9]/[1] * 100 as [9],
+1.0 *[10]/[1] * 100 as [10],
+1.0 *[11]/[1] * 100 as [11],
+1.0 *[12]/[1] * 100 as [12],
+1.0 *[13]/[1] * 100 as [13]
+from #cohort_pivot
+order by Cohort_Date
