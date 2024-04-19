@@ -11,6 +11,7 @@ The dataset used for this analysis is obtained from the UCI Machine Learning Rep
 1.	** Data Cleaning:** The dataset is cleaned to remove duplicates and records with missing customer IDs.
 
 2.	**Cohort Creation:** Customers are grouped into cohorts based on their first purchase dates.
+```
 Select
 Customerid,
 min(InvoiceDate) first_purchase_date,
@@ -18,6 +19,7 @@ DATEFROMPARTS(year(min(InvoiceDate)), month(min(InvoiceDate)),1) Cohort_Date
 into #cohort
 from #Clean_Online_Retail
 group by CustomerID
+```
 
 3.	**Cohort Retention Analysis:** Cohort retention rates are calculated to track how many customers from each cohort remain active over subsequent months.
 select Cohort_Date , 
