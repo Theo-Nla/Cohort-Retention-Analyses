@@ -22,8 +22,8 @@ group by CustomerID
 ```
 
 3.	**Cohort Retention Analysis:** Cohort retention rates are calculated to track how many customers from each cohort remain active over subsequent months.
-select Cohort_Date , 
 ```
+select Cohort_Date , 
 1.0 *[1]/[1] * 100 as [1],
 1.0 *[2]/[1] * 100 as [2],
 1.0 *[3]/[1] * 100 as [3],
