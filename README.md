@@ -45,3 +45,7 @@ order by Cohort_Date
 
 ## Tableau Visualization
 The Tableau visualization of cohort retention rates is available here.
+
+![Cohort Table](https://github.com/Theo-Nla/Cohort-Retention-Analyses/assets/135545087/b0d32205-436f-4e35-96b8-5a9a814a7079)
+
+
