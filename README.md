@@ -21,6 +21,7 @@ group by CustomerID
 
 3.	**Cohort Retention Analysis:** Cohort retention rates are calculated to track how many customers from each cohort remain active over subsequent months.
 select Cohort_Date , 
+```
 1.0 *[1]/[1] * 100 as [1],
 1.0 *[2]/[1] * 100 as [2],
 1.0 *[3]/[1] * 100 as [3],
@@ -36,6 +37,7 @@ select Cohort_Date ,
 1.0 *[13]/[1] * 100 as [13]
 from #cohort_pivot
 order by Cohort_Date
+```
 
 4.	**Tableau Visualization:** The cohort retention rates are visualized in Tableau to identify trends and patterns.
 
